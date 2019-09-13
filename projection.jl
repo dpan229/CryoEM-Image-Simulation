@@ -33,8 +33,15 @@ function sinc_pad!(vol_pad, vol, trilinear)
     end
 end
 
+function normalize_volume(vol)
+    mean = sum(vol) / length(vol)
+    stddev = sqrt(sum((vol .- mean) .^ 2)) / (length(vol) - 1)
+    return (vol .- mean) ./ stddev
+end
+
 function preprocess_for_projection(vol, pad=2, trilinear=true)
     sanity_check_volume(vol)
+    vol = normalize_volume(vol)
     padded_size = size(vol)[1] * pad
     vol_pad = zeros(padded_size, padded_size, padded_size)
     sinc_pad!(vol_pad, vol, trilinear)
